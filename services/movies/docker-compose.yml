@@ -1,0 +1,31 @@
+version: "3"
+
+services:
+  app:
+    build: .
+    command: npm run start:dev
+    volumes:
+      - ./src:/app/src
+    ports:
+      - "3000:3000"
+    networks:
+      - backend
+    depends_on:
+      - db
+  db:
+    image: "mongo:3"
+    restart: always
+    command: --auth
+    env_file:
+      - .env
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+    volumes:
+      - ./docker-entrypoint/mongo/:/docker-entrypoint-initdb.d
+    networks:
+      - backend
+networks:
+  backend:
+    driver: "bridge"
